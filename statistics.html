@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class ="body">
+    <header>
+        <div class="main-line"></div>
+        <div class="logo-main">
+            <img src="Images/LOGO FLATPRIME 1.png">
+        </div>
+        <div class="name-user">
+            <p>Дмитро</p>
+        </div>
+        <div class="user-pmg">
+            <img src="Images/user.png">
+        </div>
+    </header>
+
+    <div id="modal-menu" class="modal-menu">
+        <div class="modal-menu-content">
+            <div class="text-rec">
+                <p>Рекрутер: Дмитро</p>
+            </div>
+
+            <button class="button-menu" id="nextStatistics">
+                <div class="button-menu-text">
+                    <p>Повернутись назад</p>
+                </div>
+            </button>
+            <button class="button-menu" id="nextExit">
+                <div class="button-menu-text">
+                    <p>Вийти</p>
+                </div>
+            </button>
+            <div class="logo-menu">
+                <img src="Images/LOGO FLATPRIME 1.png" alt="Лого">
+            </div>
+        </div>
+    </div>
+
+    <div class="text-statistics">
+        <p>Статистика</p>
+    </div>
+
+    <div class="text-info">
+        <div class="one-row">
+            <p>Оберіть період часу за яким Ви бажаєте отримати статистику:</p>
+            <div class="input-calendar" id="calendarTrigger">
+                <div class="day-month">
+                    <p id="selectedDate">ДД.ММ.РР - ДД.ММ.РР</p>
+                </div>
+                <div class="img-calendar">
+                    <img src="Images/Group.png">
+                </div>
+            </div>
+        </div>       
+        <div class="one-row">
+            <p>Кількість доданих кандидатів - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+        </div>
+        <div class="one-row">
+            <p>Кількість кандидатів із статусом "НБТ"</p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+            <p>, у відсотковому співвідношенні - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+        </div>
+        <div class="one-row">
+            <p>Кількість кандидатів із статусом "Отказ"</p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+            <p>, у відсотковому співвідношенні - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+        </div>
+        <div class="one-row">
+            <p>Кількість кандидатів із статусом "Співбесіда"</p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+            <p>, у відсотковому співвідношенні - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+        </div>
+        <div class="one-row">
+            <p>Кількість кандидатів із статусом "Неактуально"</p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+            <p>, у відсотковому співвідношенні - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+        </div>
+        <div class="one-row">
+            <p>Work - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+            <p>Robota - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+            <p>Jooble - </p>
+            <div class="out-result">
+                <p>1234</p>
+            </div>
+        </div>
+    </div>
+
+<div class="calendar-container hidden" id="calendarContainer">
+    <div class="calendar">
+        <div class="calendar-header">Квітень 2025</div>
+
+        <div class="calendar-range">
+            <div class="calendar-item" id="calendar-from">
+                <div class="from-to">
+                    <p>Від:</p>
+                </div>
+                <div class="calendar-from">
+                    <div class="calendar-days">
+                        <div>Пон</div> <div>Вів</div> <div>Сер</div> <div>Чет</div>
+                        <div>П'ят</div> <div>Суб</div> <div>Нед</div>
+                    </div>
+                    <div class="calendar-dates">
+                        <div></div>  
+                        <div>1</div> <div>2</div> <div>3</div> <div>4</div> 
+                        <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> 
+                        <div>10</div> <div>11</div> <div>12</div> <div>13</div> <div>14</div> 
+                        <div>15</div> <div>16</div> <div>17</div> <div>18</div> <div>19</div> 
+                        <div>20</div> <div>21</div> <div>22</div> <div>23</div> <div>24</div> 
+                        <div>25</div> <div>26</div> <div>27</div> <div>28</div> <div>29</div> <div>30</div>
+                        <div></div> <div></div> <div></div> <div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-item" id="calendar-to">
+                <div class="from-to">
+                    <p>До:</p>
+                </div>
+                <div class="calendar-to">
+                    <div class="calendar-days">
+                        <div>Пон</div> <div>Вів</div> <div>Сер</div> <div>Чет</div>
+                        <div>П'ят</div> <div>Суб</div> <div>Нед</div>
+                    </div>
+                    <div class="calendar-dates">
+                        <div></div>  
+                        <div>1</div> <div>2</div> <div>3</div> <div>4</div> 
+                        <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> 
+                        <div>10</div> <div>11</div> <div>12</div> <div>13</div> <div>14</div> 
+                        <div>15</div> <div>16</div> <div>17</div> <div>18</div> <div>19</div> 
+                        <div>20</div> <div>21</div> <div>22</div> <div>23</div> <div>24</div> 
+                        <div>25</div> <div>26</div> <div>27</div> <div>28</div> <div>29</div> <div>30</div>
+                        <div></div> <div></div> <div></div> <div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <footer>
+        <div class="down-line"></div>
+    </footer>
+    <script src="scripts1.js"></script>
+</body>
+
+

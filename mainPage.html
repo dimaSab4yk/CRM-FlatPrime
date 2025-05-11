@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Головна сторінка</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class ="body">
+    <header>
+        <div class="main-line"></div>
+        <div class="logo-main">
+            <img src="Images/LOGO FLATPRIME 1.png">
+        </div>
+        <div class="name-user">
+            <p>Дмитро</p>
+        </div>
+        <div class="user-pmg">
+            <img src="Images/user.png">
+        </div>
+    </header>
+
+    <div class="sort-add">
+        <div class="sort">
+            <img src="Images/Кнопка _Сортувати_.png" alt="Сортувати">
+        </div>
+        <div class="add-contact">
+            <img src="Images/Кнопка _Додати контакт_.png" alt="Додати контакт">
+        </div>
+    </div>
+
+    <div class="modal-overlay"></div>
+    <div class="modal-overlay-sort"></div>
+    <div class="modal-overlay-coment" id="modal-overlay-coment"></div>
+
+    <div id="modal-menu" class="modal-menu">
+        <div class="modal-menu-content">
+            <div class="text-rec">
+                <p>Рекрутер: Дмитро</p>
+            </div>
+
+            <button class="button-menu" id="nextStatistics">
+                <div class="button-menu-text">
+                    <p>Переглянути статистику</p>
+                </div>
+            </button>
+            <button class="button-menu" id="nextExit">
+                <div class="button-menu-text">
+                    <p>Вийти</p>
+                </div>
+            </button>
+            <div class="logo-menu">
+                <img src="Images/LOGO FLATPRIME 1.png" alt="Лого">
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add" class="modal-add">
+        <div class="modal-add-content">
+            <div class="title-name-modal">
+                <h3>Заповніть дані</h3>
+            </div>
+            <div class="PIB">
+                <label for="fullName" class="text-PIB">ПІБ:</label>
+                <input type="text" id="fullName" class="input-text-modal" placeholder="Введіть ПІБ">
+            </div>
+    
+            <div class="number-phone">
+                <label for="phoneNumber" class="text-number-phone">Номер телефону:</label>
+                <input type="tel" id="phoneNumber" class="input-text-modal" placeholder="+380">
+            </div>
+
+            <div class="sourse">
+                <div class="text-sourse">
+                    <p>Джерело:</p>
+                </div>
+                <div class="dropdown-container">
+                    <input type="text" id="dropdown-input-sourse" class="dropdown-input" placeholder="Оберіть варіант" readonly>
+                        <div class="polygon" id="open-dropdown-sourse">
+                            <img src="Images/Polygon 3.png" alt="Більше">
+                        </div>
+
+                        <div id="dropdown-modal-sort-sourse" class="dropdown-modal-sort">
+                            <ul>
+                                <li data-value="Robota">Robota</li>
+                                <li data-value="Work">Work</li>
+                                <li data-value="Jooble">Jooble</li>
+                                <li data-value="Інше">Інше</li>
+                            </ul>
+                        </div>
+                </div>
+            </div>
+
+            <button class="button-verify" id="button-addContact">
+                <div class="text-button-enter">
+                    <p>Перевірити</p>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <form id="sort-form">
+        <div id="modal-sort" class="modal-sort">
+            <div class="modal-sort-content">
+                <div class="title-name-modal-sort">
+                    <h3>Сортування даних</h3>
+                </div>
+    
+                <div class="whose-sort">
+                    <div class="text-whose-sort">
+                        <p>Вибір чиї дані сортувати:</p>
+                    </div>
+                    <div class="dropdown-container" id="dropdown-container">
+                        <input type="text" id="dropdown-input" class="dropdown-input" placeholder="Оберіть варіант" readonly>
+                        <div class="polygon" id="open-dropdown">
+                            <img src="Images/Polygon 3.png" alt="Більше">
+                        </div>
+                
+                        <div id="dropdown-modal-sort" class="dropdown-modal-sort">
+                            <ul>
+                                <li data-value="Загальні дані">Загальні дані</li>
+                                <li data-value="Рекрутер Дмитро">Рекрутер Дмитро</li>
+                                <li data-value="Рекрутер Олександра">Рекрутер Олександра</li>
+                                <li data-value="Рекрутер Марія">Рекрутер Марія</li>
+                            </ul>
+                        </div>
+                    </div>  
+                </div>                
+    
+                <div class="data-sort">
+                    <div class="text-data-sort">
+                        <p>Вибір даних для сортування:</p>
+                    </div>
+                    <div class="dropdown-container" id="dropdown-container-sort">
+                        <input type="text" id="dropdown-input-sort" class="dropdown-input" placeholder="Оберіть дані" readonly>
+                        <div class="polygon" id="open-dropdown-sort">
+                            <img src="Images/Polygon 3.png" alt="Більше">
+                        </div>
+                        <div id="dropdown-modal-sort-data" class="dropdown-modal-sort">
+                            <ul>
+                                <li data-value="ПІБ">ПІБ</li>
+                                <li data-value="Номер">Номер</li>
+                                <li data-value="Статус">Статус</li>
+                                <li data-value="Дата">Дата</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+    
+                <button type="submit" class="button-sort">
+                    <div class="text-button-enter">
+                        <p>Сортувати</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </form>
+     
+    <div class="title-table">
+        <div class="column column-1">№</div>
+        <div class="column column-2">ПІБ</div>
+        <div class="column column-3">Номер</div>
+        <div class="column column-4">Статус</div>
+        <div class="column column-5">Джерело</div>
+        <div class="column column-6">Рекрутер</div>
+        <div class="column column-7">Дата</div>
+        <div class="column column-8">Комент</div>
+    </div> 
+    
+    <div class="line-table">
+        <div class="column column-1">1</div>
+        <div class="column column-2">Іванов Іван Іванович</div>
+        <div class="column column-3">380931681546</div>
+        <div class="column column-4">
+            <div class="change-status">Співбесіда</div></div>
+        <div class="column column-5">
+            <div class="change-sourse">Work</div></div>
+        <div class="column column-6">Дмитро</div>
+        <div class="column column-7">04.02.2025</div>
+        <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+    </div>
+
+    <div class="line-table">
+        <div class="column column-1">2</div>
+        <div class="column column-2">Степанов Степан Степанович</div>
+        <div class="column column-3">380635834276</div>
+        <div class="column column-4">
+            <div class="change-status">НБТ</div></div>
+        <div class="column column-5">
+            <div class="change-sourse">Jooble</div></div>
+        <div class="column column-6">Дмитро</div>
+        <div class="column column-7">04.02.2025</div>
+        <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+    </div>
+
+    <div class="line-table">
+        <div class="column column-1">3</div>
+        <div class="column column-2">Данил Вікторович</div>
+        <div class="column column-3">380635834276</div>
+        <div class="column column-4">
+            <div class="change-status">Отказ</div></div>
+        <div class="column column-5">
+            <div class="change-sourse">Robota</div></div>
+        <div class="column column-6">Олександра</div>
+        <div class="column column-7">04.02.2025</div>
+        <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+    </div>
+
+    <div class="line-table">
+        <div class="column column-1">4</div>
+        <div class="column column-2">Петров Петро Петрович</div>
+        <div class="column column-3">380639909885</div>
+        <div class="column column-4">
+            <div class="change-status">Неактуально</div></div>
+        <div class="column column-5">
+            <div class="change-sourse">Robota</div></div>
+        <div class="column column-6">Олександра</div>
+        <div class="column column-7">04.02.2025</div>
+        <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+    </div>
+
+    <div class="line-table">
+        <div class="column column-1">5</div>
+        <div class="column column-2">Воля Володимир Володимирович</div>
+        <div class="column column-3">380639909885</div>
+        <div class="column column-4">
+            <div class="change-status">Не підходить</div></div>
+        <div class="column column-5">
+            <div class="change-sourse">Robota</div></div>
+        <div class="column column-6">Марія</div>
+        <div class="column column-7">04.02.2025</div>
+        <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+    </div>
+
+    <div class="line-table">
+        <div class="column column-1">6</div>
+        <div class="column column-2">Максим Максич Максимович</div>
+        <div class="column column-3">380639836563</div>
+        <div class="column column-4">
+            <div class="change-status">Перезвон</div></div>
+        <div class="column column-5">
+            <div class="change-sourse">Robota</div></div>
+        <div class="column column-6">Марія</div>
+        <div class="column column-7">04.02.2025</div>
+        <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+    </div>
+
+    <div class="modal-coment" id="modal-coment">
+        <div class="modal-coment-content">
+            <div class="text-center">
+                <p>Додайте коментар</p>
+            </div>
+            <textarea class="input-text-coment" placeholder="Введіть коментар..."></textarea>
+            <button class="button-save">
+                <div class="button-save-text">
+                    <p>Зберегти</p>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <div class="number-page">
+        <img class="arrow" src="Images/🦆 icon _arrow thick left.png">
+        <div class="number"> <p>1</p></div>
+        <div class="number"> <p>2</p></div>
+        <div class="number"> <p>3</p></div>
+        <div class="points"><p>...</p></div>
+        <div class="number"> <p>29</p></div>
+        <div class="number"> <p>30</p></div>
+        <img class="arrow" src="Images/🦆 icon _arrow thick right.png">
+    </div>
+    <footer>
+        <div class="down-line"></div>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
