@@ -779,3 +779,9 @@ header {
     background: #E3E9F3;
     border-radius: 15px;
 }
+
+.number.active {
+    background-color: #263F6A;
+    color: white;
+    border-radius: 100px;
+}
