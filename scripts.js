@@ -319,52 +319,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 //Виведення кандидатів із БД в головну сторінку
-/*document.addEventListener("DOMContentLoaded", async function () {
-    if (!window.location.pathname.includes("mainPage.html")) return;
-    try {
-        const response = await fetch("http://localhost:5200/api/all-candidates");
-        if (!response.ok) throw new Error("Не вдалося завантажити кандидатів");
-
-        const candidates = await response.json();
-
-        // Сортуємо за спаданням id (нові зверху)
-        candidates.sort((a, b) => a.id - b.id);
-
-        const table = document.querySelector(".title-table");
-        if (!table) return;
-
-        // Очистити попередні динамічні рядки
-        document.querySelectorAll(".line-table.dynamic").forEach(el => el.remove());
-
-        candidates.forEach(candidate => {
-            const newLine = document.createElement("div");
-            newLine.classList.add("line-table", "dynamic");
-
-            const formattedDate = candidate.created_at ?
-                new Date(candidate.created_at).toLocaleDateString("uk-UA") :
-                new Date().toLocaleDateString("uk-UA");
-
-            newLine.innerHTML = `
-                <div class="column column-1">${candidate.id}</div>
-                <div class="column column-2">${candidate.full_name}</div>
-                <div class="column column-3">${candidate.phonenumber}</div>
-                <div class="column column-4"><div class="change-status">${candidate.status}</div></div>
-                <div class="column column-5"><div class="change-sourse">${candidate.source}</div></div>
-                <div class="column column-6">Дмитро</div>
-                <div class="column column-7">${formattedDate}</div>
-                <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
-            `;
-
-             table.insertAdjacentElement("afterend", newLine); // ✅ просто додаємо після заголовку
-        });
-
-        applySourceColors();
-
-    } catch (err) {
-        console.error("Помилка при завантаженні кандидатів:", err);
-    }
-});*/
-
 let currentPage = 1;
 const itemsPerPage = 10;
 let allCandidates = [];

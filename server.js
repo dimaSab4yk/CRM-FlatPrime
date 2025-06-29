@@ -100,6 +100,30 @@ app.get('/api/all-candidates', async (req, res) => {
     }
 });
 
+app.get('/api/statistics', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE status = 'НБТ') AS nbt,
+                COUNT(*) FILTER (WHERE status = 'Отказ') AS refusal,
+                COUNT(*) FILTER (WHERE status = 'Співбесіда') AS interview,
+                COUNT(*) FILTER (WHERE status = 'Неактуально') AS not_actual,
+                COUNT(*) FILTER (WHERE status = 'Перезвон') AS call_back,
+                COUNT(*) FILTER (WHERE status = 'Не підходить') AS not_suitable,
+                COUNT(*) FILTER (WHERE source = 'Work') AS work,
+                COUNT(*) FILTER (WHERE source = 'Robota') AS robota,
+                COUNT(*) FILTER (WHERE source = 'Jooble') AS jooble
+            FROM candidates;
+        `);
+
+        res.status(200).json(result.rows[0]);
+    } catch (err) {
+        console.error('❌ Помилка при обчисленні статистики:', err);
+        res.status(500).json({ error: 'Помилка сервера при отриманні статистики' });
+    }
+});
+
 app.listen(5200, () => {
     console.log('Сервер запущено на порту 5200');
 });

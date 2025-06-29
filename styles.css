@@ -524,13 +524,18 @@ header {
     margin-top: 15px; 
 }
 
-.out-result{
+.out-result {
     width: 120px;
     height: 60px;
     background-color: #C5D0E3;
     border-radius: 15px;
     text-align: center;
+
+    display: flex;              
+    justify-content: center;    
+    align-items: center;        
 }
+
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
 .hidden {
@@ -628,7 +633,6 @@ header {
     color: #263F6A;
 }
 /*--------------------------------------------------------------------------------------------------------------------------*/
-
 .modal-coment {
     width: 50%;
     height: 600px;
@@ -685,6 +689,10 @@ header {
     color: #ffffff;
     text-align: center;
 }
+.modal-coment, .modal-overlay-coment {
+    display: none;
+}
+
 /*---------------------------------------------------------------------------------------------------------------------------------------*/
 
 .text-add-contact{

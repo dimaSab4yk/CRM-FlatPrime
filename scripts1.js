@@ -91,3 +91,73 @@ if (returnBack) {
         window.location.href = "mainPage.html";
     });
 }
+
+async function loadCandidatesAndCalculateStats() {
+    try {
+        const response = await fetch("http://localhost:5200/api/all-candidates");
+        if (!response.ok) throw new Error("Не вдалося завантажити кандидатів");
+
+        const candidates = await response.json();
+
+        const totalCandidates = candidates.length;
+
+        // Підрахунок кандидатів за статусами
+        const statuses = ["НБТ", "Отказ", "Співбесіда", "Неактуально", "Перезвон", "Не підходить"];
+        const statusCounts = {};
+        statuses.forEach(status => statusCounts[status] = 0);
+
+        candidates.forEach(c => {
+            if (statuses.includes(c.status)) {
+                statusCounts[c.status]++;
+            }
+        });
+
+        // Підрахунок відсотків за статусами
+        const statusPercentages = {};
+        statuses.forEach(status => {
+            statusPercentages[status] = totalCandidates > 0 ? ((statusCounts[status] / totalCandidates) * 100).toFixed(1) : 0;
+        });
+
+        // Підрахунок кандидатів за джерелами
+        const sources = ["Work", "Robota", "Jooble"];
+        const sourceCounts = {};
+        sources.forEach(src => sourceCounts[src] = 0);
+
+        candidates.forEach(c => {
+            if (sources.includes(c.source)) {
+                sourceCounts[c.source]++;
+            }
+        });
+
+        // Тепер виводимо в DOM
+
+        // Загальна кількість
+        document.querySelectorAll(".text-info .out-result")[0].querySelector("p").textContent = totalCandidates;
+
+        // Статуси
+        let statusIndex = 1; // починаючи з другого .out-result, бо перший - загальна кількість
+        statuses.forEach(status => {
+            // Кількість
+            document.querySelectorAll(".text-info .out-result")[statusIndex].querySelector("p").textContent = statusCounts[status];
+            // Відсоток (підрядок після кількості)
+            document.querySelectorAll(".text-info .out-result")[statusIndex + 1].querySelector("p").textContent = statusPercentages[status] + "%";
+            statusIndex += 2;
+        });
+
+        // Джерела (останні 3 блоки)
+        const lastResults = document.querySelectorAll(".text-info .out-result");
+        sources.forEach((src, i) => {
+            lastResults[lastResults.length - sources.length + i].querySelector("p").textContent = sourceCounts[src];
+        });
+
+    } catch (err) {
+        console.error("Помилка при завантаженні статистики:", err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.location.pathname.includes("statistics.html")) {
+        loadCandidatesAndCalculateStats();
+    }
+});
+
