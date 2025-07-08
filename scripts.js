@@ -350,7 +350,7 @@ function renderCandidatesPage(page) {
             <div class="column column-5"><div class="change-sourse">${candidate.source}</div></div>
             <div class="column column-6">Дмитро</div>
             <div class="column column-7">${formattedDate}</div>
-            <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
+            <div class="column column-8"><img class="coment-img" data-id="${candidate.id}" src="Images/🦆 icon _speech_.png"></div>
         `;
 
         table.insertAdjacentElement("afterend", newLine);
@@ -358,6 +358,61 @@ function renderCandidatesPage(page) {
 
     applySourceColors();
 }
+
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("coment-img")) {
+        const modalComent = document.getElementById("modal-coment");
+        const modalOverlay = document.getElementById("modal-overlay-coment");
+
+        const candidateId = e.target.dataset.id;
+        console.log("🟡 Відкрито коментар для кандидата з ID:", candidateId);
+
+        // Зберігаємо id тимчасово (наприклад, у data-атрибут або глобально)
+        modalComent.dataset.candidateId = candidateId;
+
+        if (modalComent && modalOverlay) {
+            modalComent.style.display = "block";
+            modalOverlay.style.display = "block";
+        }
+    }
+});
+
+document.querySelector(".button-save").addEventListener("click", async function () {
+    const commentText = document.querySelector(".input-text-coment").value.trim();
+    const modalComent = document.getElementById("modal-coment");
+    const candidateId = modalComent.dataset.candidateId;
+
+    if (!commentText) {
+        alert("❌ Коментар не може бути порожнім.");
+        return;
+    }
+
+    console.log("💬 Збереження коментаря:", commentText, "для кандидата ID:", candidateId);
+
+    // TODO: Надіслати на сервер:
+    try {
+        const response = await fetch(`http://localhost:5200/api/candidates/${candidateId}/comment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ comment: commentText })
+        });
+
+    if (response.ok) {
+         alert("✅ Коментар збережено!");
+
+         // 🔽 Закриваємо модальне вікно після підтвердження
+        modalComent.style.display = "none";
+        document.getElementById("modal-overlay-coment").style.display = "none";
+        document.querySelector(".input-text-coment").value = ""; // Очистити поле
+    }
+    else {
+            const err = await response.json();
+            alert("❌ Помилка: " + err.message);
+        }
+    } catch (err) {
+        console.error("❌ Помилка при надсиланні коментаря:", err);
+    }
+});
 
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);

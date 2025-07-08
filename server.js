@@ -124,6 +124,32 @@ app.get('/api/statistics', async (req, res) => {
     }
 });
 
+app.post('/api/candidates/:id/comment', async (req, res) => {
+    const candidateId = req.params.id;
+    const { comment } = req.body;
+
+    if (!comment || !candidateId) {
+        return res.status(400).json({ message: 'ID кандидата i коментар є обов’язковими.' });
+    }
+
+    try {
+        const result = await pool.query(
+            `UPDATE candidates SET comment = $1 WHERE id = $2 RETURNING *;`,
+            [comment, candidateId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Кандидат не знайдений.' });
+        }
+
+        res.status(200).json({ message: 'Коментар збережено успішно.', candidate: result.rows[0] });
+    } catch (err) {
+        console.error('❌ Помилка при збереженні коментаря:', err);
+        res.status(500).json({ message: 'Помилка сервера при збереженні коментаря.' });
+    }
+});
+
+
 app.listen(5200, () => {
     console.log('Сервер запущено на порту 5200');
 });
