@@ -149,6 +149,45 @@ app.post('/api/candidates/:id/comment', async (req, res) => {
     }
 });
 
+app.get('/api/candidates/:id/get-comment', async (req, res) => {
+    const candidateId = req.params.id;
+
+    try {
+        const result = await pool.query(
+            `SELECT comment FROM candidates WHERE id = $1`,
+            [candidateId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Кандидат не знайдений.' });
+        }
+
+        res.status(200).json({ comment: result.rows[0].comment });
+    } catch (err) {
+        console.error('❌ Помилка при отриманні коментаря:', err);
+        res.status(500).json({ message: 'Помилка сервера при отриманні коментаря.' });
+    }
+});
+
+// 🔍 Пошук дублікатів за номером телефону
+app.get("/api/candidates/duplicates", async (req, res) => {
+    const phone = req.query.phoneNumber;
+
+    if (!phone) return res.status(400).json({ message: "Номер не вказаний" });
+
+    try {
+        const duplicates = await pool.query(
+            "SELECT * FROM candidates WHERE phonenumber = $1",
+            [phone]
+        );
+
+        res.json(duplicates.rows);
+    } catch (err) {
+        console.error("❌ Помилка при пошуку дублів:", err);
+        res.status(500).json({ message: "Помилка сервера" });
+    }
+});
+
 
 app.listen(5200, () => {
     console.log('Сервер запущено на порту 5200');

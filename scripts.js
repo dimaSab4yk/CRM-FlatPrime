@@ -260,6 +260,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const savedContact = result.data;  // має містити id
                 localStorage.setItem("newContact", JSON.stringify(savedContact));
 
+                //checkForDuplicates(savedContact.phoneNumber);
+
                 window.location.href = "addContact.html";
             } catch (error) {
                 console.error("❌ Помилка при збереженні:", error.message);
@@ -269,6 +271,51 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+async function checkForDuplicates(phoneNumber) {
+    try {
+        const response = await fetch(`http://localhost:5200/api/candidates/duplicates?phoneNumber=${phoneNumber}`);
+        if (!response.ok) throw new Error("Помилка отримання дублікатів");
+
+        const duplicates = await response.json();
+
+        // Приховуємо блок "Дублі відсутні"
+        const emptyLine = document.querySelector(".empty-line");
+        if (emptyLine) emptyLine.style.display = "none";
+
+        if (duplicates.length === 0) {
+            // Показуємо, що дублі відсутні
+            if (emptyLine) emptyLine.style.display = "block";
+            return;
+        }
+
+        const lastCandidate = document.querySelector(".line-table"); // останній доданий
+        duplicates.forEach((dup, index) => {
+            const row = document.createElement("div");
+            row.classList.add("line-table");
+
+            const formattedDate = dup.created_at
+                ? new Date(dup.created_at).toLocaleDateString("uk-UA")
+                : "-";
+
+            row.innerHTML = `
+                <div class="column column-1">${dup.id}</div>
+                <div class="column column-2">${dup.full_name}</div>
+                <div class="column column-3">${dup.phonenumber}</div>
+                <div class="column column-4"><div class="change-status">${dup.status || ""}</div></div>
+                <div class="column column-5"><div class="change-sourse">${dup.source || ""}</div></div>
+                <div class="column column-6">${dup.recruiter || "Невідомо"}</div>
+                <div class="column column-7">${formattedDate}</div>
+                <div class="column column-8"><img class="coment-img" data-id="${dup.id}" src="Images/🦆 icon _speech_.png"></div>
+            `;
+
+            lastCandidate.insertAdjacentElement("afterend", row);
+        });
+
+        applySourceColors(); // щоб зафарбувати джерело
+    } catch (err) {
+        console.error("❌ Помилка при перевірці дублів:", err);
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     const contactData = localStorage.getItem("newContact");
@@ -312,6 +359,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const table = document.querySelector(".title-table-new");
         if (table) {
             table.insertAdjacentElement("afterend", newLine);
+        }
+
+        // 🔽 Перевірка дублів після рендера
+        if (contact.phonenumber || contact.phoneNumber) {
+            const phone = contact.phonenumber || contact.phoneNumber;
+            checkForDuplicates(phone);
         }
     } else {
         console.log("Дані не знайдені в localStorage.");
@@ -413,6 +466,55 @@ document.querySelector(".button-save").addEventListener("click", async function 
         console.error("❌ Помилка при надсиланні коментаря:", err);
     }
 });
+
+document.addEventListener("click", async function (e) {
+    if (e.target.classList.contains("coment-img")) {
+        const modalComent = document.getElementById("modal-coment");
+        const modalOverlay = document.getElementById("modal-overlay-coment");
+        const textarea = document.querySelector(".input-text-coment");
+
+        const candidateId = e.target.dataset.id;
+        console.log("🟡 Відкрито коментар для кандидата з ID:", candidateId);
+
+        modalComent.dataset.candidateId = candidateId;
+
+        // Отримуємо вже існуючий коментар (GET)
+        try {
+            const response = await fetch(`http://localhost:5200/api/candidates/${candidateId}/get-comment`);
+            if (response.ok) {
+                const data = await response.json();
+                textarea.value = data.comment || ""; // Показати коментар або порожній
+            } else {
+                textarea.value = "";
+                console.warn("⚠️ Коментар не знайдений або помилка.");
+            }
+        } catch (err) {
+            textarea.value = "";
+            console.error("❌ Помилка при завантаженні коментаря:", err);
+        }
+
+        // Показуємо модальне вікно
+        if (modalComent && modalOverlay) {
+            modalComent.style.display = "block";
+            modalOverlay.style.display = "block";
+        }
+    }
+});
+
+document.getElementById("modal-overlay-coment").addEventListener("click", () => {
+    closeCommentModal();
+});
+
+function closeCommentModal() {
+    const modalComent = document.getElementById("modal-coment");
+    const modalOverlay = document.getElementById("modal-overlay-coment");
+    const textarea = document.querySelector(".input-text-coment");
+
+    modalComent.style.display = "none";
+    modalOverlay.style.display = "none";
+    textarea.value = ""; // Очищення поля
+    delete modalComent.dataset.candidateId; // Очистити id, якщо треба
+}
 
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
