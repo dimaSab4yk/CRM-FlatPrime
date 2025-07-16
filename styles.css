@@ -705,16 +705,21 @@ header {
 .empty-line {
     height: 80px;
     background-color: #E3E9F3;
-    /*display: flex;*/
-    display: none;
+    display: flex;
     justify-content: center; 
-    align-items: center; 
+    align-content: center;
+    margin: 20px auto;              
+    border: 2px solid #263F6A;      
+    max-width: 100%;                 
+    box-sizing: border-box;
 }
 
-.text-empty{
+.text-empty {
     font-size: 32px;
     color: #263F6A;
+    text-align: center;
 }
+
 
 .button-container {
     display: flex;

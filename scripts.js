@@ -278,20 +278,33 @@ async function checkForDuplicates(phoneNumber) {
 
         const duplicates = await response.json();
 
-        // Приховуємо блок "Дублі відсутні"
+        // 🔍 Отримуємо блок "Перевірка дублів:"
+        const duplicatesSection = document.querySelectorAll(".text-add-contact")[1];
+
+        // 🔍 Видаляємо попередні дублікати і лінію, якщо були
+        const oldDuplicateRows = document.querySelectorAll(".duplicate-row, .duplicate-separator");
+        oldDuplicateRows.forEach(row => row.remove());
+
+        // 🔍 Показуємо або ховаємо "Дублі відсутні"
         const emptyLine = document.querySelector(".empty-line");
-        if (emptyLine) emptyLine.style.display = "none";
 
         if (duplicates.length === 0) {
-            // Показуємо, що дублі відсутні
             if (emptyLine) emptyLine.style.display = "block";
             return;
+        } else {
+            if (emptyLine) emptyLine.style.display = "none";
         }
 
-        const lastCandidate = document.querySelector(".line-table"); // останній доданий
-        duplicates.forEach((dup, index) => {
+        // ⬛ Вставляємо роздільну лінію перед дублями
+        const separator = document.createElement("div");
+        separator.classList.add("first-line", "duplicate-separator");
+        duplicatesSection.insertAdjacentElement("afterend", separator);
+
+        // 🧱 Додаємо знайдені дублі після лінії
+        let insertAfter = separator;
+        duplicates.forEach((dup) => {
             const row = document.createElement("div");
-            row.classList.add("line-table");
+            row.classList.add("line-table", "duplicate-row");
 
             const formattedDate = dup.created_at
                 ? new Date(dup.created_at).toLocaleDateString("uk-UA")
@@ -308,20 +321,23 @@ async function checkForDuplicates(phoneNumber) {
                 <div class="column column-8"><img class="coment-img" data-id="${dup.id}" src="Images/🦆 icon _speech_.png"></div>
             `;
 
-            lastCandidate.insertAdjacentElement("afterend", row);
+            insertAfter.insertAdjacentElement("afterend", row);
+            insertAfter = row;
         });
 
-        applySourceColors(); // щоб зафарбувати джерело
+        applySourceColors(); // стилі джерел
     } catch (err) {
         console.error("❌ Помилка при перевірці дублів:", err);
     }
 }
 
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const contactData = localStorage.getItem("newContact");
 
     if (contactData) {
-        console.log("Дані отримано з localStorage:", contactData);  // Перевірка отриманих даних
+        console.log("Дані отримано з localStorage:", contactData);
         const contact = JSON.parse(contactData);
 
         const currentDate = new Date();
@@ -336,7 +352,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const newLine = document.createElement("div");
         newLine.classList.add("line-table");
-
         newLine.innerHTML = 
             `<div class="column column-1">${index}</div>
             <div class="column column-2">${contact.full_name}</div> 
@@ -353,9 +368,9 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <div class="column column-6">${recruiter}</div>
             <div class="column column-7">${formattedDate}</div>
-            <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>
-        `;
+            <div class="column column-8"><img class="coment-img" src="Images/🦆 icon _speech_.png"></div>`;
 
+        // Вставити рядок кандидата після таблиці
         const table = document.querySelector(".title-table-new");
         if (table) {
             table.insertAdjacentElement("afterend", newLine);
@@ -371,6 +386,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
+
 //Виведення кандидатів із БД в головну сторінку
 let currentPage = 1;
 const itemsPerPage = 10;
@@ -380,14 +397,17 @@ function renderCandidatesPage(page) {
     const table = document.querySelector(".title-table");
     if (!table) return;
 
-    // Очистити попередні
     document.querySelectorAll(".line-table.dynamic").forEach(el => el.remove());
 
-    const start = (page - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const candidatesToShow = allCandidates.slice(start, end);
+    const totalItems = allCandidates.length;
 
-    candidatesToShow.forEach(candidate => {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    const candidatesToShow = allCandidates.slice(startIndex, endIndex); // усе!
+    candidatesToShow.reverse();
+
+    candidatesToShow.forEach((candidate) => {
         const newLine = document.createElement("div");
         newLine.classList.add("line-table", "dynamic");
 
@@ -410,8 +430,97 @@ function renderCandidatesPage(page) {
     });
 
     applySourceColors();
+    applyStatusColors();
 }
 
+function renderPagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginationContainer = document.querySelector(".number-page");
+
+    if (!paginationContainer) return;
+
+    paginationContainer.innerHTML = ""; // очистити
+
+    // Ліва стрілка
+    const leftArrow = document.createElement("img");
+    leftArrow.src = "Images/🦆 icon _arrow thick left.png";
+    leftArrow.classList.add("arrow");
+    leftArrow.addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderCandidatesPage(currentPage);
+            renderPagination(allCandidates.length);
+        }
+    });
+    paginationContainer.appendChild(leftArrow);
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (
+            i === 1 || 
+            i === totalPages || 
+            (i >= currentPage - 1 && i <= currentPage + 1)
+        ) {
+            const numberDiv = document.createElement("div");
+            numberDiv.classList.add("number");
+            if (i === currentPage) numberDiv.classList.add("active"); // підсвічуємо
+
+            const p = document.createElement("p");
+            p.textContent = i;
+            numberDiv.appendChild(p);
+
+            numberDiv.addEventListener("click", () => {
+                currentPage = i;
+                renderCandidatesPage(currentPage);
+                renderPagination(allCandidates.length);
+            });
+
+            paginationContainer.appendChild(numberDiv);
+        } else if (
+            i === currentPage - 2 || 
+            i === currentPage + 2
+        ) {
+            const dots = document.createElement("div");
+            dots.classList.add("points");
+            dots.innerHTML = "<p>...</p>";
+            paginationContainer.appendChild(dots);
+        }
+    }
+
+    // Права стрілка
+    const rightArrow = document.createElement("img");
+    rightArrow.src = "Images/🦆 icon _arrow thick right.png";
+    rightArrow.classList.add("arrow");
+    rightArrow.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderCandidatesPage(currentPage);
+            renderPagination(allCandidates.length);
+        }
+    });
+    paginationContainer.appendChild(rightArrow);
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+    if (!window.location.pathname.includes("mainPage.html")) return;
+
+    try {
+        const response = await fetch("http://localhost:5200/api/all-candidates");
+        if (!response.ok) throw new Error("Не вдалося завантажити кандидатів");
+
+        const candidates = await response.json();
+
+        // Сортування (новіші зверху)
+        allCandidates = candidates;
+
+        renderCandidatesPage(currentPage);
+        renderPagination(allCandidates.length);
+
+    } catch (err) {  
+        console.error("Помилка при завантаженні кандидатів:", err);
+    }
+});
+
+//Додавання і зберігання коментарів
 document.addEventListener("click", function (e) {
     if (e.target.classList.contains("coment-img")) {
         const modalComent = document.getElementById("modal-coment");
@@ -516,94 +625,6 @@ function closeCommentModal() {
     delete modalComent.dataset.candidateId; // Очистити id, якщо треба
 }
 
-function renderPagination(totalItems) {
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const paginationContainer = document.querySelector(".number-page");
-
-    if (!paginationContainer) return;
-
-    paginationContainer.innerHTML = ""; // очистити
-
-    // Ліва стрілка
-    const leftArrow = document.createElement("img");
-    leftArrow.src = "Images/🦆 icon _arrow thick left.png";
-    leftArrow.classList.add("arrow");
-    leftArrow.addEventListener("click", () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderCandidatesPage(currentPage);
-            renderPagination(allCandidates.length);
-        }
-    });
-    paginationContainer.appendChild(leftArrow);
-
-    for (let i = 1; i <= totalPages; i++) {
-        if (
-            i === 1 || 
-            i === totalPages || 
-            (i >= currentPage - 1 && i <= currentPage + 1)
-        ) {
-            const numberDiv = document.createElement("div");
-            numberDiv.classList.add("number");
-            if (i === currentPage) numberDiv.classList.add("active"); // підсвічуємо
-
-            const p = document.createElement("p");
-            p.textContent = i;
-            numberDiv.appendChild(p);
-
-            numberDiv.addEventListener("click", () => {
-                currentPage = i;
-                renderCandidatesPage(currentPage);
-                renderPagination(allCandidates.length);
-            });
-
-            paginationContainer.appendChild(numberDiv);
-        } else if (
-            i === currentPage - 2 || 
-            i === currentPage + 2
-        ) {
-            const dots = document.createElement("div");
-            dots.classList.add("points");
-            dots.innerHTML = "<p>...</p>";
-            paginationContainer.appendChild(dots);
-        }
-    }
-
-    // Права стрілка
-    const rightArrow = document.createElement("img");
-    rightArrow.src = "Images/🦆 icon _arrow thick right.png";
-    rightArrow.classList.add("arrow");
-    rightArrow.addEventListener("click", () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderCandidatesPage(currentPage);
-            renderPagination(allCandidates.length);
-        }
-    });
-    paginationContainer.appendChild(rightArrow);
-}
-
-document.addEventListener("DOMContentLoaded", async function () {
-    if (!window.location.pathname.includes("mainPage.html")) return;
-
-    try {
-        const response = await fetch("http://localhost:5200/api/all-candidates");
-        if (!response.ok) throw new Error("Не вдалося завантажити кандидатів");
-
-        const candidates = await response.json();
-
-        // Сортування (новіші зверху)
-        allCandidates = candidates.sort((a, b) => a.id - b.id);
-
-        renderCandidatesPage(currentPage);
-        renderPagination(allCandidates.length);
-
-    } catch (err) {
-        console.error("Помилка при завантаженні кандидатів:", err);
-    }
-});
-
-
 document.querySelector('.addContact').addEventListener('click', async () => {
     const contactData = localStorage.getItem("newContact");
     const status = localStorage.getItem("selectedStatus");
@@ -659,28 +680,30 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-document.querySelectorAll(".change-status").forEach(element => {
-    switch (element.textContent.trim()) {
-        case "Співбесіда":
-            element.style.backgroundColor = "rgba(163, 233, 198, 0.5)"; 
-            break;
-        case "НБТ":
-            element.style.backgroundColor = "rgba(180, 186, 192, 0.5)"; 
-            break;
-        case "Отказ":
-            element.style.backgroundColor = "rgba(240, 102, 102, 0.5)"; 
-            break;
-        case "Неактуально":
-            element.style.backgroundColor = "rgba(254, 204, 96, 0.5)"; 
-            break;
-        case "Не підходить":
-            element.style.backgroundColor = "rgba(202, 110, 82, 0.5)"; 
-            break;
-        case "Перезвон":
-            element.style.backgroundColor = "rgba(212, 228, 119, 0.5)"; 
-            break;
-    }
-});
+function applyStatusColors() {
+    document.querySelectorAll(".change-status").forEach(element => {
+        switch (element.textContent.trim()) {
+            case "Співбесіда":
+                element.style.backgroundColor = "rgba(163, 233, 198, 0.5)"; 
+                break;
+            case "НБТ":
+                element.style.backgroundColor = "rgba(180, 186, 192, 0.5)"; 
+                break;
+            case "Отказ":
+                element.style.backgroundColor = "rgba(240, 102, 102, 0.5)"; 
+                break;
+            case "Неактуально":
+                element.style.backgroundColor = "rgba(254, 204, 96, 0.5)"; 
+                break;
+            case "Не підходить":
+                element.style.backgroundColor = "rgba(202, 110, 82, 0.5)"; 
+                break;
+            case "Перезвон":
+                element.style.backgroundColor = "rgba(212, 228, 119, 0.5)"; 
+                break;
+        }
+    });
+}
 
 function applySourceColors() {
     document.querySelectorAll(".change-sourse").forEach(element => {
