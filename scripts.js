@@ -331,8 +331,6 @@ async function checkForDuplicates(phoneNumber) {
     }
 }
 
-
-
 document.addEventListener("DOMContentLoaded", function () {
     const contactData = localStorage.getItem("newContact");
 
@@ -381,12 +379,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const phone = contact.phonenumber || contact.phoneNumber;
             checkForDuplicates(phone);
         }
+        applySourceColors();
+        applyStatusColors();
     } else {
         console.log("Дані не знайдені в localStorage.");
     }
 });
-
-
 
 //Виведення кандидатів із БД в головну сторінку
 let currentPage = 1;
@@ -549,9 +547,22 @@ document.querySelector(".button-save").addEventListener("click", async function 
         return;
     }
 
-    console.log("💬 Збереження коментаря:", commentText, "для кандидата ID:", candidateId);
+    const isAddContactPage = window.location.href.includes("addContact.html");
 
-    // TODO: Надіслати на сервер:
+    if (isAddContactPage) {
+        // 💾 Зберігаємо коментар до тимчасового кандидата в localStorage
+        const tempData = JSON.parse(localStorage.getItem("newContact")) || {};
+        tempData.comment = commentText;
+        localStorage.setItem("newContact", JSON.stringify(tempData));
+
+        alert("✅ Коментар збережено тимчасово!");
+        modalComent.style.display = "none";
+        document.getElementById("modal-overlay-coment").style.display = "none";
+        document.querySelector(".input-text-coment").value = "";
+        return;
+    }
+
+    // 🔽 Надсилаємо на сервер
     try {
         const response = await fetch(`http://localhost:5200/api/candidates/${candidateId}/comment`, {
             method: 'POST',
@@ -559,15 +570,12 @@ document.querySelector(".button-save").addEventListener("click", async function 
             body: JSON.stringify({ comment: commentText })
         });
 
-    if (response.ok) {
-         alert("✅ Коментар збережено!");
-
-         // 🔽 Закриваємо модальне вікно після підтвердження
-        modalComent.style.display = "none";
-        document.getElementById("modal-overlay-coment").style.display = "none";
-        document.querySelector(".input-text-coment").value = ""; // Очистити поле
-    }
-    else {
+        if (response.ok) {
+            alert("✅ Коментар збережено!");
+            modalComent.style.display = "none";
+            document.getElementById("modal-overlay-coment").style.display = "none";
+            document.querySelector(".input-text-coment").value = "";
+        } else {
             const err = await response.json();
             alert("❌ Помилка: " + err.message);
         }
@@ -576,23 +584,45 @@ document.querySelector(".button-save").addEventListener("click", async function 
     }
 });
 
+
 document.addEventListener("click", async function (e) {
     if (e.target.classList.contains("coment-img")) {
         const modalComent = document.getElementById("modal-coment");
         const modalOverlay = document.getElementById("modal-overlay-coment");
         const textarea = document.querySelector(".input-text-coment");
 
+        // Визначаємо сторінку
+        const isAddContactPage = window.location.href.includes("addContact.html");
+
+        if (isAddContactPage) {
+            // Тимчасовий кандидат — беремо ID з локального сховища або інший спосіб
+            console.log("🟡 Тимчасовий кандидат — відкриття коментаря");
+
+            modalComent.dataset.candidateId = "temp"; // або будь-що фіксоване
+            const tempContact = JSON.parse(localStorage.getItem("newContact"));
+            textarea.value = tempContact?.comment || "";
+
+            modalComent.style.display = "block";
+            modalOverlay.style.display = "block";
+            return;
+        }
+
+        // 🔽 Далі основна БД
         const candidateId = e.target.dataset.id;
+        if (!candidateId) {
+            console.warn("⚠️ Немає ID кандидата для коментаря");
+            return;
+        }
+
         console.log("🟡 Відкрито коментар для кандидата з ID:", candidateId);
 
         modalComent.dataset.candidateId = candidateId;
 
-        // Отримуємо вже існуючий коментар (GET)
         try {
             const response = await fetch(`http://localhost:5200/api/candidates/${candidateId}/get-comment`);
             if (response.ok) {
                 const data = await response.json();
-                textarea.value = data.comment || ""; // Показати коментар або порожній
+                textarea.value = data.comment || "";
             } else {
                 textarea.value = "";
                 console.warn("⚠️ Коментар не знайдений або помилка.");
@@ -602,13 +632,11 @@ document.addEventListener("click", async function (e) {
             console.error("❌ Помилка при завантаженні коментаря:", err);
         }
 
-        // Показуємо модальне вікно
-        if (modalComent && modalOverlay) {
-            modalComent.style.display = "block";
-            modalOverlay.style.display = "block";
-        }
+        modalComent.style.display = "block";
+        modalOverlay.style.display = "block";
     }
 });
+
 
 document.getElementById("modal-overlay-coment").addEventListener("click", () => {
     closeCommentModal();
@@ -625,6 +653,7 @@ function closeCommentModal() {
     delete modalComent.dataset.candidateId; // Очистити id, якщо треба
 }
 
+//Додавання кандата в БД
 document.querySelector('.addContact').addEventListener('click', async () => {
     const contactData = localStorage.getItem("newContact");
     const status = localStorage.getItem("selectedStatus");
@@ -637,12 +666,14 @@ document.querySelector('.addContact').addEventListener('click', async () => {
     const temp = JSON.parse(contactData);
 
     const contact = {
-        id: temp.id,  // ОБОВ’ЯЗКОВО передаємо id тимчасового кандидата
-        full_name: temp.full_name,
-        phoneNumber: temp.phoneNumber || temp.phonenumber,  // дивись як зберігається
-        source: temp.source,
-        status: status
-    };
+    id: temp.id,
+    full_name: temp.full_name,
+    phoneNumber: temp.phoneNumber || temp.phonenumber,
+    source: temp.source,
+    status: status,
+    comment: temp.comment || "" // ✅ ось тут найважливіше
+};
+
 
     try {
         const response = await fetch('http://localhost:5200/api/candidates', {

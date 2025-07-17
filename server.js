@@ -56,20 +56,20 @@ app.post('/api/temp-candidates', async (req, res) => {
 });
 
 app.post('/api/candidates', async (req, res) => {
-    const { full_name, phoneNumber, status, source } = req.body;
-    console.log("Перед відправкою на сервер:", full_name, phoneNumber, status, source);
+    const { full_name, phoneNumber, status, source, comment } = req.body;
+    console.log("Перед відправкою на сервер:", full_name, phoneNumber, status, source, comment);
 
-    if (!full_name || !phoneNumber || !source || !status) {
+    if (!full_name || !phoneNumber || !source || !status || !comment) {
         return res.status(400).json({ error: "Всі поля обов'язкові для заповнення." });
     }
 
     try {
         // Додаємо в основну таблицю
         const insertQuery = `
-            INSERT INTO candidates (full_name, phonenumber, status, source)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO candidates (full_name, phonenumber, status, source, comment)
+            VALUES ($1, $2, $3, $4, $5)
         `;
-        await pool.query(insertQuery, [full_name, phoneNumber, status, source]);
+        await pool.query(insertQuery, [full_name, phoneNumber, status, source, comment]);
         console.log("✅ Додано до candidates");
 
         // Видаляємо з тимчасової таблиці
@@ -168,6 +168,32 @@ app.get('/api/candidates/:id/get-comment', async (req, res) => {
         res.status(500).json({ message: 'Помилка сервера при отриманні коментаря.' });
     }
 });
+
+app.post('/api/temp-candidates/:id/comment', async (req, res) => {
+    const tempCandidateId = req.params.id;
+    const { comment } = req.body;
+
+    if (!comment || !tempCandidateId) {
+        return res.status(400).json({ message: 'ID кандидата i коментар є обов’язковими.' });
+    }
+
+    try {
+        const result = await pool.query(
+            `UPDATE temp_candidates SET comment = $1 WHERE id = $2 RETURNING *;`,
+            [comment, tempCandidateId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Кандидат не знайдений у тимчасовій таблиці.' });
+        }
+
+        res.status(200).json({ message: 'Коментар тимчасово збережено успішно.', candidate: result.rows[0] });
+    } catch (err) {
+        console.error('❌ Помилка при збереженні коментаря у тимчасовій таблиці:', err);
+        res.status(500).json({ message: 'Помилка сервера при збереженні коментаря.' });
+    }
+});
+
 
 // 🔍 Пошук дублікатів за номером телефону
 app.get("/api/candidates/duplicates", async (req, res) => {
